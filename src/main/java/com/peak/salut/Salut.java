@@ -74,6 +74,7 @@ public class Salut implements WifiP2pManager.ConnectionInfoListener {
     protected SalutDevice lastConnectedDevice;
     public ArrayList<SalutDevice> foundDevices;
     public ArrayList<SalutDevice> registeredClients;
+    public ArrayList<String> rawData;
 
     protected SalutDeviceCallback onDeviceUnregistered;
 
@@ -95,6 +96,7 @@ public class Salut implements WifiP2pManager.ConnectionInfoListener {
         thisDevice.txtRecord = salutServiceData.serviceData;
 
         foundDevices = new ArrayList<>();
+        rawData= new ArrayList<>();
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -167,6 +169,15 @@ public class Salut implements WifiP2pManager.ConnectionInfoListener {
         ArrayList<String> foundHostNames = new ArrayList<>(foundDevices.size());
         for (SalutDevice device : foundDevices) {
             foundHostNames.add(device.readableName);
+        }
+
+        return foundHostNames;
+    }
+
+    public ArrayList<String> getReadableFoundMac() {
+        ArrayList<String> foundHostNames = new ArrayList<>(foundDevices.size());
+        for (SalutDevice device : foundDevices) {
+            foundHostNames.add(device.getMacAddress());
         }
 
         return foundHostNames;
@@ -624,6 +635,8 @@ public class Salut implements WifiP2pManager.ConnectionInfoListener {
                         }
                     }
                 }
+
+                rawData.add(device.deviceAddress+"|"+record.get("INSTANCE_NAME")+"|"+record.get("SERVICE_NAME"));
 
                 if (record.containsValue(thisDevice.serviceName)) {
                     SalutDevice foundDevice = new SalutDevice(device, record);
